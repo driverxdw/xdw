@@ -1,2 +1,0 @@
-# xdw
-xdw's repository
