@@ -1,0 +1,4 @@
+#########################################
+apache2服务器我是安装包安装的没有用源码，安装包安装好后以后，运行apachectl，这个是apache2的控制文件
+apache2ctl运行完以后运行firefox localhost/以后可以进入localhost的默认页面 ，默认是It works的式样，
+默认文件存放在/var/www/html/html.index里面，想要改变默认页面只需要把写好的html文件往里面扔就行了。

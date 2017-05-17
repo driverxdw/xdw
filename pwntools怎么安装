@@ -1,0 +1,139 @@
+pwntools是一个CTF框架和漏洞利用开发库，用Python开发，由rapid设计，旨在让使用者简单快速的编写exploit。
+
+pwntools对Ubuntu 12.04和14.04的支持最好，但是绝大多数的功能也支持Debian, Arch, FreeBSD, OSX, 等等。
+
+安装前确保安装了Binutils、Capstone、Python Development Headers等系统库
+
+-----------------------
+
+本文将基于Kali Rolling 64位安装，Ubuntu64位安装也是类似的（毕竟pwntools对Ubuntu支持是最好的）。
+
+暂时不会有windows安装法。
+
+关于kali2 32位或者其他32位系统也是很难弄，本文后面会有一番折腾（但也不是所有功能都可以用）
+
+-------------------
+
+1、安装Capstone
+
+Capstone disassembly/disassembler framework: Core (Arm, Arm64, M68K, Mips, PPC, Sparc, SystemZ, X86, X86_64, XCore) + bindings (Python, Java, Ocaml)
+
+在终端输入
+
+git clone https://github.com/aquynh/capstone
+cd capstone
+make
+make install
+
+（这里很顺利）
+
+ 
+
+2、安装pwntools
+
+在终端输入
+
+git clone https://github.com/Gallopsled/pwntools
+cd pwntools
+python setup.py install
+
+如果没报错，并且终端输入python进入其交互模式后，输入import pwn回车后没报错，差不多就好了。
+
+这时候再尝试pwntools的asm功能
+
+>>> pwn.asm("xor eax,eax")
+'1\xc0'
+
+如果有正确输出，即说明这个功能是可以用的，到这里就算安装完成。
+
+（如果想了解更多asm可以访问： http://pwntools.readthedocs.io/en/latest/asm.html）
+
+ 
+
+3、安装pwntools时出现的各种错误
+
+Err1:
+
+fatal error: openssl/e_os2.h: 没有那个文件或目录
+
+要解决这个问题，只需要安装OpenSSL 开发包
+
+apt-get install libssl-dev
+
+ 
+
+Err2:
+
+error: Installed distribution pyasn1 0.1.7 conflicts with requirement pyasn1>=0.1.8
+
+把pyasn1(ASN.1 library for Python)更新即可
+
+git clone https://github.com/etingof/pyasn1
+cd pyasn1
+python setup.py install
+
+ 
+
+4、使用asm功能报错
+
+[!] Your local binutils won't be used because architecture 'i686' is not supported.
+[!] Could not find 'as' installed for ContextType()
+    Try installing binutils for this architecture:
+        https://pwntools.readthedocs.org/en/latest/install/binutils.html
+
+大概就是Binutils库不支持i686这种32位架构（Binutils 是一组开发工具，包括连接器，汇编器和其他用于目标文件和档案的工具。）
+
+我访问了里面的链接地址，下面是里面的安装方法：
+
+apt-get install software-properties-common
+apt-add-repository ppa:pwntools/binutils
+apt-get update
+
+apt-get install binutils-$ARCH-linux-gnu  # $ARCH is your target architecture (e.g., arm, mips64, vax, etc.).
+
+我在kali2 32位执行到第2句会报
+
+aptsources.distro.NoDistroTemplateException: Error: could not find a distribution template for Kali/sana
+
+诶- -。伤感，然后我看那链接里后面的一个sh，里面写得不好（rm后还能tar解压。。），即使我修改后运行sh也解决不了这个asm问题。
+
+在我绝望的时候，我觉得可以去github找找，果然让我找到了一个pwntools-binutils项目
+
+git clone https://github.com/Gallopsled/pwntools-binutils
+cd ubuntu
+chmod +x install_all.sh
+./install_all.sh arm #your architecture
+
+项目里面ubuntu文件夹有一个install.sh和install_all.sh，但我试了./install.sh arm找不到安装包后，我就只好尝试./install_all.sh arm安装所有。
+
+这一试，也让我知道Binutils库目前支持的架构。
+
+以下的安装包是存在的（其架构也是被支持的）：
+
+binutils-aarch64-linux-gnu
+binutils-mips-linux-gnu
+binutils-powerpc-linux-gnu
+
+而下面这些安装包暂时是不存在：
+复制代码
+
+binutils-alpha-linux-gnu
+binutils-arm-linux-gnu
+binutils-avr-linux-gnu
+binutils-cris-linux-gnu
+binutils-hppa-linux-gnu
+binutils-ia64-linux-gnu
+binutils-m68k-linux-gnu
+binutils-mips64-linux-gnu
+binutils-msp430-linux-gnu
+binutils-powerpc64-linux-gnu
+binutils-s390-linux-gnu
+binutils-sparc-linux-gnu
+binutils-vax-linux-gnu
+binutils-xscale-linux-gnu
+binutils-i386-linux-gnu
+binutils-x86_64-linux-gnu
+
+复制代码
+
+所以暂时不被支持的架构下是无法安装好Binutils库，也就无法使用asm功能。

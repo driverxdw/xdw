@@ -1,0 +1,21 @@
+在网络连接窗口中切换到VPN选项卡，点击“添加”。
+
+添加VPN网络
+
+在弹出创建VPN类型窗口中选择“Point-to-Point Tunneling Protocol (PPTP)”，点击“新建”。
+
+创建VPN类型
+
+填写连接名称和VPN服务器地址、用户名密码。
+
+编辑VPN连接
+
+点击上图右下角的“Advanced”按钮，在高级设置里取消“EAP”选项，另外勾选“Use point-to-point encryption(MPPE)”，然后点击确定退出。
+
+VPN高级选项
+
+完成以上设置后，在任务栏里的网络图标就可以看到创建好的VPN连接了。
+
+点击VPN连接
+
+点击即可连接，连接成功后有个“小锁”图标。
