@@ -1,0 +1,56 @@
+ rpm包和源码包安装的区别 (2013-02-22 09:30:29)
+转载
+▼
+	分类： Linux学习
+
+ 建议在安装线上的生产服务器软件包时都用源码安装，这是因为源码安装可以自行调整编译参数，最大化地定制安装结果。这里以MySQL 5线上环境的编译安装来说明之，其编译参数如下所示：
+
+    ./configure -prefix=/usr/local/mysql -without-debug 
+    -without-bench -enable-thread-safe-client -enable-assembler 
+    -enable-profiling -with-mysqld-ldflags=-all-static -
+    with-client-ldflags=-all-static -with-charset=latin1 -
+    with-extra-charset=utf8,gbk -with-innodb -with-csv-storage
+    -engine -with-federated-storage-engine -with-mysqld-user=mysql
+    -without-embedded-server -with-server-suffix=-community 
+    -with-unix-socket-path=/usr/local/mysql/sock/mysql.sock && 
+    make && make install
+     
+
+在安装MySQL时，源码安装与rpm安装相较，其特点如下：
+
+我们可以针对自己的硬件平台选用合适的编译器来优化编译后的二进制代码。
+
+根据不同的软件平台环境调整相关的编译参数(源码安装不仅适用于rhel/centos，其他系统像FreeBSD、Solaris、Ubuntu等一样适用)。
+
+可针对特定的应用场景选择需要什么组件或不需要什么组件。
+
+同一台主机上可以安装多个MySQL(rpm安装则仅能安装一个MySQL)。
+
+根据需要存储的数据内容选择只安装需要的字符集。
+
+理论上源码静态编译方式安装效率会高一点，但到底比rpm方式高多少得看具体情况，一般在5%左右。
+
+某次在线上环境工作，我用yum卸载一个软件包时遇到了极其危险的情况，这里也跟大家分享一下：当时，yum remove自动卸载了许多这个软件包自身依赖的系统包，导致系统崩溃了，SSH不能登录，并且SCP及RSYNC也都不能用了，幸亏FTP命令还能用， 所以数据很快被FTP传到其他服务器上了，但系统已经彻底崩溃，只有重装了。如果是源码安装的软件包就没有这种危险，需要卸载时只需要删除软件包安装的目 录即可。
+
+综上所述，源码安装的好处如下：
+
+最大的好处就是可以自行调整编译参数，最大化地定制安装结果。
+
+源码安装可以选择最新的软件包，而Linux系统(包括FreeBSD)自带的软件包一般都是最稳定的版本，但不能保证是最新的。
+
+相对而言，源码安装的性能是最优异的。
+
+源码包安装的软件卸载时极为方便和简单，更重要的是，它比较安全，尤其是对线上的生产环境而言。
+
+迁徙也比较方便，如果不涉及系统库文件，复制到另一台机器上也可以使用。
+
+这里也简单介绍一下在Linux/Unix下安装软件的源码三部曲，在后面我们会经常看到它们的身影。
+
+    ./configure  
+    make  
+    make install 
+
+./configure是用来检查环境变量及配置编译选项的，make是用来将源代码编译成二进制文件的，而make install则会将make编译出来的文件安装到指定位置(或默认位置)。
+
+在本节中，我们从服务器的硬件选择、安装及内核等方面对单机服务器的性能进行了优化，不过对于网站和系统来说，单机优化对整体性能提升的作用毕竟有限，整体性能提升主要靠服务器的高可用和高扩展性来实现，这部分内容在后面的章节中再来说明。
+
