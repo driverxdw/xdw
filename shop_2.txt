@@ -1,0 +1,5 @@
+orange 10
+apple 12
+purple 14
+banana 15
+peach 10
