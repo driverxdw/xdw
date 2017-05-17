@@ -1,0 +1,133 @@
+撤销修改
+
+    这里有3中情况
+    改乱了工作区某个文件的内容，想直接丢弃工作区的修改时，用命令git checkout -- file。
+    不但改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，分两步，第一步用命令git reset HEAD file，就回到了1，第二步,按照1操作。
+    已经提交了不合适的修改到版本库时，想要撤销本次提交，可以版本回退，不过前提是没有推送到远程库。
+
+//第一种撤销：工作区撤销
+ubuntu@myubuntu:~/joe/learngit$ vi readme.txt //工作区的错误还没有add到暂存区
+ubuntu@myubuntu:~/joe/learngit$ git status 
+位于分支 master
+尚未暂存以备提交的变更：
+  （使用 "git add <file>..." 更新要提交的内容）
+  （使用 "
+
+git checkout -- <file>..."
+
+ 丢弃工作区的改动）
+
+    修改：     readme.txt
+
+修改尚未加入提交（使用 "git add" 和/或 "git commit -a"）
+ubuntu@myubuntu:~/joe/learngit$ 
+
+git checkout --
+
+ readme.txt
+ubuntu@myubuntu:~/joe/learngit$ vi readme.txt
+//第二种撤销：暂存区撤销
+ubuntu@myubuntu:~/joe/learngit$ vi readme.txt 
+ubuntu@myubuntu:~/joe/learngit$ git add readme.txt //错误的文件已经提交到暂存区了
+ubuntu@myubuntu:~/joe/learngit$ git status
+位于分支 master
+要提交的变更：
+  （使用 "
+
+git reset HEAD <file>..."
+
+ 撤出暂存区）
+
+    修改：     readme.txt
+
+ubuntu@myubuntu:~/joe/learngit$ git reset HEAD readme.txt
+重置后撤出暂存区的变更：
+M    readme.txt
+ubuntu@myubuntu:~/joe/learngit$ vi readme.txt 
+ubuntu@myubuntu:~/joe/learngit$ git status  //撤出暂存区后，还需使用checkout丢弃工作区的改动
+位于分支 master
+尚未暂存以备提交的变更：
+  （使用 "git add <file>..." 更新要提交的内容）
+  （使用 "git checkout -- <file>..." 丢弃工作区的改动）
+
+    修改：     readme.txt
+
+修改尚未加入提交（使用 "git add" 和/或 "git commit -a"）
+ubuntu@myubuntu:~/joe/learngit$ 
+
+git checkout --
+
+ readme.txt
+ubuntu@myubuntu:~/joe/learngit$ vi readme.txt
+//第三种已经提交，使用版本回退（学习笔记2）
+
+文件的删除
+
+    使用rm删除文件，然后git add filename添加到暂存区，git commit 提交。
+    直接使用git rm filename ，不用git add直接git commit即可。
+
+//第一种方法git rm file
+ubuntu@myubuntu:~/joe/learngit$ ls
+abc.c  readme.txt
+ubuntu@myubuntu:~/joe/learngit$ 
+
+git rm
+
+ abc.c 
+rm 'abc.c'
+ubuntu@myubuntu:~/joe/learngit$ git status
+位于分支 master
+要提交的变更：
+  （使用 "git reset HEAD <file>..." 撤出暂存区）
+
+    删除：     abc.c
+
+ubuntu@myubuntu:~/joe/learngit$ 
+
+git commit -m "del abc"
+
+
+[master 020f927] del abc
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ delete mode 100644 abc.c
+ubuntu@myubuntu:~/joe/learngit$ git status
+位于分支 master
+无文件要提交，干净的工作区
+ubuntu@myubuntu:~/joe/learngit$ ls
+readme.txt
+//第二种方法rm file
+ubuntu@myubuntu:~/joe/learngit$ ls
+ab.c  readme.txt
+ubuntu@myubuntu:~/joe/learngit$ rm ab.c
+ubuntu@myubuntu:~/joe/learngit$ ls
+readme.txt
+ubuntu@myubuntu:~/joe/learngit$ git status
+位于分支 master
+尚未暂存以备提交的变更：
+  （使用 "git add/rm <file>..." 更新要提交的内容）
+  （使用 "git checkout -- <file>..." 丢弃工作区的改动）
+
+    删除：     ab.c
+
+修改尚未加入提交（使用 "git add" 和/或 "git commit -a"）
+ubuntu@myubuntu:~/joe/learngit$ git add ab.c 
+ubuntu@myubuntu:~/joe/learngit$ git status
+位于分支 master
+要提交的变更：
+  （使用 "git reset HEAD <file>..." 撤出暂存区）
+
+    删除：     ab.c
+
+ubuntu@myubuntu:~/joe/learngit$ 
+
+git commit -m "del ab.c"
+
+
+[master 0ad1dfe] del ab.c
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ delete mode 100644 ab.c
+ubuntu@myubuntu:~/joe/learngit$ git status
+位于分支 master
+无文件要提交，干净的工作区
+
+
