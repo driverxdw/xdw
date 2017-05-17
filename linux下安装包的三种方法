@@ -1,0 +1,102 @@
+ ubuntu下安装程序的三种方法
+引言
+
+在ubuntu当中，安装应用程序我所知道的有三种方法，分别是apt-get，dpkg安装deb和make install安装源码包三种。下面针对每一种方法各举例来说明。
+apt-get方法
+
+使用apt-get install来安装应用程序算是最常见的一种安装方法了，比如我要安装build-essential这个软件，使用以下，他会帮我把所有的依赖包都一起安装了。
+
+sudo apt-get install build-essential
+
+执行上述命令以后，我们可以看到一下信息，The following extra packages will be installed:表示所有需要再安装的依赖包。
+复制代码
+
+sudo apt-get install build-essential
+[sudo] password for enadmin: 
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+The following extra packages will be installed:
+  binutils cpp cpp-4.6 dpkg-dev fakeroot g++ g++-4.6 gcc gcc-4.6
+  libalgorithm-diff-perl libalgorithm-diff-xs-perl libalgorithm-merge-perl
+  libc-bin libc-dev-bin libc6 libc6-dev libdpkg-perl libgomp1 libmpc2 libmpfr4
+  libquadmath0 libstdc++6-4.6-dev linux-libc-dev manpages-dev
+Suggested packages:
+  binutils-doc cpp-doc gcc-4.6-locales debian-keyring g++-multilib
+  g++-4.6-multilib gcc-4.6-doc libstdc++6-4.6-dbg gcc-multilib autoconf
+  automake1.9 libtool flex bison gdb gcc-doc gcc-4.6-multilib
+  libmudflap0-4.6-dev libgcc1-dbg libgomp1-dbg libquadmath0-dbg
+  libmudflap0-dbg binutils-gold glibc-doc libstdc++6-4.6-doc
+The following NEW packages will be installed:
+  binutils build-essential cpp cpp-4.6 dpkg-dev fakeroot g++ g++-4.6 gcc
+  gcc-4.6 libalgorithm-diff-perl libalgorithm-diff-xs-perl
+  libalgorithm-merge-perl libc-dev-bin libc6-dev libdpkg-perl libgomp1 libmpc2
+  libmpfr4 libquadmath0 libstdc++6-4.6-dev linux-libc-dev manpages-dev
+The following packages will be upgraded:
+  libc-bin libc6
+2 upgraded, 23 newly installed, 0 to remove and 101 not upgraded.
+Need to get 36.3 MB of archives.
+After this operation, 83.6 MB of additional disk space will be used.
+Do you want to continue [Y/n]? y
+
+复制代码
+
+下面给出apt-get的的各种参数：
+
+apt-get install xxx 安装xxx  。如果带有参数，那么-d 表示仅下载 ，-f 表示强制安装  
+apt-get remove xxx 卸载xxx  
+apt-get update 更新软件信息数据库  
+apt-get upgrade 进行系统升级  
+apt-cache search 搜索软件包  
+Tips：建议您经常使用“apt-get update”命令来更新您的软件信息数据库 
+
+apt-get理论上是要求能够联网，但是如果制作了本地源，就不需要联网，制作本地源可以参考：ubuntu制作本地源
+dpkg安装deb包
+
+Ubuntu软件包格式为deb，安装方法如下：
+
+    sudo  dpkg  -i  package.deb
+
+dpkg的详细使用方法，网上有很多，下面简单列了几个：
+dpkg -i package.deb 	安装包
+dpkg -r package 	删除包
+dpkg -P package 	删除包（包括配置文件）
+dpkg -L package 	列出与该包关联的文件
+dpkg -l package 	显示该包的版本
+dpkg –unpack package.deb 	解开 deb 包的内容
+dpkg -S keyword 	搜索所属的包内容
+dpkg -l 	列出当前已安装的包
+dpkg -c package.deb 	列出 deb 包的内容
+dpkg –configure package 	配置包
+
+根据Ubuntu中文论坛上介绍，使用apt-get方法安装的软件，所有下载的deb包都缓存到了/var/cache/apt/archives目录下了，所以可以把常用的deb包备份出来，甚至做成ISO工具包、刻盘，以后安装Ubuntu时就可以在没有网络环境的情况下进行了。下面的命令是拷贝archives这个目录到/var/cache/apt/目录下，替换原有的archives
+
+enadmin@ubuntu-server:~/ftp$ sudo cp -r archives/ /var/cache/apt/
+
+make install源代码安装
+如果要使用make安装的话，那么必须得安装build-essential这个依赖包，安装方法已经在前面说过了。在安装完毕以后，我们就可以进行源码安装。源码安装大致可以分为三步骤：（./configure）–＞ 编译（sudo make） –＞ 安装（sudo make install）。
+
+    配置：这是编译源代码的第一步，通过 ./configure 命令完成。执行此步以便为编译源代码作准备。常用的选项有 --prefix=PREFIX，用以指定程序的安装位置。更多的选项可通过 --help 查询。也有某些程序无需执行此步。
+    编译：一旦配置通过，可即刻使用 make 指令来执行源代码的编译过程。视软件的具体情况而定，编译所需的时间也各有差异，我们所要做的就是耐心等候和静观其变。此步虽然仅下简单的指令，但有时候所遇到的问题却十分复杂。较常碰到的情形是程序编译到中途却无法圆满结束。此时，需要根据出错提示分析以便找到应对之策。
+    安装：如果编译没有问题，那么执行 sudo make install 就可以将程序安装到系统中了。
+
+下面以安装nagios为例进行说明。
+复制代码
+
+//1.解压缩
+tar -zxf nagios-4.0.2.tar.gz  
+//2.进入目录
+cd nagios-4.0.2
+//3.配置
+./configure --prefix=/usr/local/nagios     
+//4.编译
+make all
+//5.安装
+make install && make install-init && make install-commandmode && make install-config
+
+复制代码
+
+以上就是源代码安装方式。
+
+ 
+
